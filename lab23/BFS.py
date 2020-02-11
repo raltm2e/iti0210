@@ -6,6 +6,7 @@ def minu_otsing(kaart, start):
     frontier.put(start)
     came_from = {start: None}
     diamond_coordinates = ()
+    iteration_count = 0
 
     while not frontier.empty():
         current = frontier.get()
@@ -22,6 +23,8 @@ def minu_otsing(kaart, start):
             if check_conditions(neighbor, kaart, came_from):
                 frontier.put(neighbor)
                 came_from[neighbor] = current
+        iteration_count += 1
+    print("Iterated " + str(iteration_count) + " times.")
     return get_path(came_from, diamond_coordinates)
 
 
@@ -47,24 +50,32 @@ def check_conditions(current, kaart, came_from):
         return False
 
 
+def read_big_map(filename):
+    with open(filename) as f:
+        map_data = [l.strip() for l in f.readlines() if len(l) > 1]
+    return map_data
+
+
 if __name__ == "__main__":
-    lava_map1 = [
-        "      **               **      ",
-        "     ***     D        ***      ",
-        "     ***                       ",
-        "                      *****    ",
-        "           ****      ********  ",
-        "           ***          *******",
-        " **                      ******",
-        "*****             ****     *** ",
-        "*****              **          ",
-        "***                            ",
-        "              **         ******",
-        "**            ***       *******",
-        "***                      ***** ",
-        "                               ",
-        "                s              ",
-    ]
-    start_row = 14
-    start_col = 16
-    print(minu_otsing(lava_map1, (start_row, start_col)))
+    # lava_map1 = [
+    #     "      **               **      ",
+    #     "     ***     D        ***      ",
+    #     "     ***                       ",
+    #     "                      *****    ",
+    #     "           ****      ********  ",
+    #     "           ***          *******",
+    #     " **                      ******",
+    #     "*****             ****     *** ",
+    #     "*****              **          ",
+    #     "***                            ",
+    #     "              **         ******",
+    #     "**            ***       *******",
+    #     "***                      ***** ",
+    #     "                               ",
+    #     "                s              ",
+    # ]
+    # start_row = 14
+    # start_col = 16
+    lava_map = read_big_map("cave900x900")
+    start_row, start_col = 2, 2
+    print(minu_otsing(lava_map, (start_row, start_col)))
