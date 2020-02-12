@@ -1,19 +1,19 @@
-from queue import Queue
+from queue import Queue, PriorityQueue
 
 
-def minu_otsing(kaart, start):
-    frontier = Queue()
-    frontier.put(start)
+def greedy_search(kaart, start, goal):
+    frontier = PriorityQueue()
+    frontier.put((0, start))
     came_from = {start: None}
     diamond_coordinates = ()
     iteration_count = 0
 
     while not frontier.empty():
-        current = frontier.get()
+        _, current = frontier.get()
         current_x = current[0]
         current_y = current[1]
-        # print(current_x, current_y)
-        # print(kaart[current_x][current_y])
+        print(current_x, current_y)
+        print(kaart[current_x][current_y])
         if kaart[current_x][current_y] == "D":
             diamond_coordinates = current
             break
@@ -21,11 +21,17 @@ def minu_otsing(kaart, start):
         neighbor_list = find_neighbors(current_x, current_y)
         for neighbor in neighbor_list:
             if check_conditions(neighbor, kaart, came_from):
-                frontier.put(neighbor)
+                priority = h(neighbor, goal)
+                frontier.put((priority, neighbor))
                 came_from[neighbor] = current
+
         iteration_count += 1
     print("Iterated " + str(iteration_count) + " times.")
     return get_path(came_from, diamond_coordinates)
+
+
+def h(neighbor, goal):
+    return abs(neighbor[0] - goal[0]) + abs(neighbor[1] - goal[1])
 
 
 def get_path(came_from, diamond_coordinates):
@@ -57,25 +63,25 @@ def read_big_map(filename):
 
 
 if __name__ == "__main__":
-    # lava_map1 = [
-    #     "      **               **      ",
-    #     "     ***     D        ***      ",
-    #     "     ***                       ",
-    #     "                      *****    ",
-    #     "           ****      ********  ",
-    #     "           ***          *******",
-    #     " **                      ******",
-    #     "*****             ****     *** ",
-    #     "*****              **          ",
-    #     "***                            ",
-    #     "              **         ******",
-    #     "**            ***       *******",
-    #     "***                      ***** ",
-    #     "                               ",
-    #     "                s              ",
-    # ]
-    # start_row = 14
-    # start_col = 16
-    lava_map = read_big_map("cave900x900")
-    start_row, start_col = 2, 2
-    print(minu_otsing(lava_map, (start_row, start_col)))
+    lava_map = [
+        "      **               **      ",
+        "     ***     D        ***      ",
+        "     ***                       ",
+        "                      *****    ",
+        "           ****      ********  ",
+        "           ***          *******",
+        " **                      ******",
+        "*****             ****     *** ",
+        "*****              **          ",
+        "***                            ",
+        "              **         ******",
+        "**            ***       *******",
+        "***                      ***** ",
+        "                               ",
+        "                s              ",
+    ]
+    start_position = (14, 16)
+    goal_position = (1, 13)
+    # lava_map = read_big_map("cave900x900")
+    # start_row, start_col = 2, 2
+    print(greedy_search(lava_map, start_position, goal_position))
