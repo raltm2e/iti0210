@@ -1,11 +1,12 @@
-from queue import Queue, PriorityQueue
+from queue import PriorityQueue
 
 
-def greedy_search(kaart, start, goal):
+def astar(kaart, start, goal):
     frontier = PriorityQueue()
     frontier.put((0, start))
     came_from = {start: None}
     diamond_coordinates = ()
+    cost_so_far = {start: 0}
     iteration_count = 0
 
     while not frontier.empty():
@@ -18,11 +19,14 @@ def greedy_search(kaart, start, goal):
             break
 
         neighbor_list = find_neighbors(current_x, current_y)
+        new_cost = cost_so_far[current] + 1
         for neighbor in neighbor_list:
             if check_conditions(neighbor, kaart, came_from):
-                priority = h(neighbor, goal)
-                frontier.put((priority, neighbor))
-                came_from[neighbor] = current
+                if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                    cost_so_far[neighbor] = new_cost
+                    priority = new_cost + h(neighbor, goal)  # g(n) + h(n)
+                    frontier.put((priority, neighbor))
+                    came_from[neighbor] = current
 
         iteration_count += 1
     print("Iterated " + str(iteration_count) + " times.")
@@ -84,6 +88,6 @@ if __name__ == "__main__":
     lava_map = read_big_map("cave900x900")
     start_position = (2, 2)
     goal_position = (898, 895)
-    path = greedy_search(lava_map, start_position, goal_position)
+    path = astar(lava_map, start_position, goal_position)
     print(path)
     print("Path length is: " + str(len(path)))
