@@ -27,6 +27,10 @@ class NQPosition:
             for j in range(i + 1, self.N):
                 if self.queenList[i] == self.queenList[j]:
                     conflict_number += 1
+                if self.queenList[i] == self.queenList[j] + 1:
+                    conflict_number += 1
+                if self.queenList[i] == self.queenList[j] - 1:
+                    conflict_number += 1
         return conflict_number
 
 
@@ -44,7 +48,6 @@ class NQPosition:
 
         best_conflict_value = 99999
         best_move = ()
-        print(len(best_move))
         for move in possible_moves:
             nqPosition = NQPosition(self.N)
             nqPosition.make_move(move)
@@ -54,8 +57,6 @@ class NQPosition:
                 best_move = move
 
         return best_move, best_conflict_value
-        #find the best move and the value function after making that move
-        #return move, value
 
 
 pos = NQPosition(4)
