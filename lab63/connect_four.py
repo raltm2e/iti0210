@@ -1,89 +1,96 @@
 import operator, random
 
 
-def pure_mc(position, my_side, N=200):
-    initial_moves = moves(position)
+def pure_mc(positions_list, my_side, N=200):
+    initial_moves = moves(positions_list)
     win_counts = dict((move, 0) for move in initial_moves)
-
     for move in initial_moves:
         for i in range(N):
-            res = simulate(position, my_side)
+            positions_list_copy = positions_list.copy()
+            res = simulate(positions_list_copy, my_side)
             if res == "WIN":
                 win_counts[move] += 1
             elif res == "DRAW":
                 win_counts[move] += 0.5
+    print("Win counts: ", win_counts)
     return max(win_counts.items(), key=operator.itemgetter(1))[0]
 
 
-def play_game(position, player_turn, player_side ="X"):
+def play_game(positions_list, player_turn, player_side ="X"):
     playing = True
+    oponent_side = "X"
+    if player_side == "X":
+        oponent_side = "O"
     while playing:
         if player_turn:
-            print(position)
-            print_board(position)
-            move = get_player_move(position)
+            print(positions_list)
+            print_board(positions_list)
+            move = get_player_move(positions_list)
             player_turn = False
-            position = make_move(position, move, player_side)
+            positions_list = make_move(positions_list, move, player_side)
         else:
-            #move = pure_mc(position, player_side)
+            move = pure_mc(positions_list, oponent_side)
             player_turn = True
-        #position = make_move(position, move, player_side)
-        if is_over(position) > 0:
+            positions_list = make_move(positions_list, move, oponent_side)
+        if is_over(positions_list) > 0:
             playing = False
 
 
-def simulate(position, player_side):
+def simulate(positions_list, player_side):
     playing = True
     player_turn = True
+    oponent_side = "X"
+    if player_side == "X":
+        oponent_side = "O"
     while playing:
         if player_turn:
-            print(position)
-            move = get_random_move(position)
+            move = get_random_move(positions_list)
             player_turn = False
+            positions_list = make_move(positions_list, move, player_side)
         else:
-            move = get_random_move(position)
+            move = get_random_move(positions_list)
             player_turn = True
-
-        position = make_move(position, move, player_side)
-        if is_over(position) > 0:
+            positions_list = make_move(positions_list, move, oponent_side)
+        if is_over(positions_list) > 0:
             playing = False
-    if is_over(position) == 2:
+    if is_over(positions_list) == 2:
         return "WIN"
-    if is_over(position) == 3:
+    if is_over(positions_list) == 3:
         return "DRAW"
+    else:
+        return "LOSE"
 
 
-def moves(position):
+def moves(positions_list):
     moveList = [0, 1, 2, 3, 4, 5, 6]
     suitable_moves = []
     for move in moveList:
-        if len(position[move]) < 6:
+        if len(positions_list[move]) < 6:
             suitable_moves.append(move)
     return suitable_moves
 
 
-def make_move(position, move, player_side):
-    if position[move] == [0]:
-        position[move] = [player_side]
+def make_move(positions_list, move, player_side):
+    if positions_list[move] == [0]:
+        positions_list[move] = [player_side]
     else:
-        position[move].append(player_side)
-    return position
+        positions_list[move].append(player_side)
+    return positions_list
 
 
-def is_over(position):
+def is_over(positions_list):
     # 0 - game continues; 1 - X wins; 2 - O wins; 3 - draw, no more moves
-    horisontal_sum = get_horisontal_sum(position)
-    diagonal_sum = get_diagonal_sum(position)
+    horisontal_sum = get_horisontal_sum(positions_list)
+    diagonal_sum = get_diagonal_sum(positions_list)
     if horisontal_sum > 0:
         return horisontal_sum
     if diagonal_sum > 0:
         return diagonal_sum
-    for coordinate in position.values():
+    for coordinate in positions_list.values():
         if get_vertical_sum(coordinate) > 0:
             return get_vertical_sum(coordinate)
-    if len(moves(position)) == 0:
+    if len(moves(positions_list)) == 0:
         return 3
-    print(horisontal_sum, diagonal_sum)
     return 0
 
 
@@ -160,6 +167,7 @@ def print_board(positions):
         line += "|"
         print(line)
     print("|0123456|")
+
 
 if __name__ == '__main__':
     position = {0: [0], 1: [0], 2: [0], 3: [0], 4: [0], 5: [0], 6: [0]}
