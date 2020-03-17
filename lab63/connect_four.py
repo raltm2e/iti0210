@@ -57,8 +57,6 @@ def moves(position):
     moveList = [0, 1, 2, 3, 4, 5, 6]
     suitable_moves = []
     for move in moveList:
-        print("Move", move)
-        print(len(position[move]) < 6)
         if len(position[move]) < 6:
             suitable_moves.append(move)
     return suitable_moves
@@ -82,9 +80,10 @@ def is_over(position):
         return diagonal_sum
     for coordinate in position.values():
         if get_vertical_sum(coordinate) > 0:
-            get_vertical_sum(coordinate)
+            return get_vertical_sum(coordinate)
     if len(moves(position)) == 0:
         return 3
+    print(horisontal_sum, diagonal_sum)
     return 0
 
 
@@ -98,9 +97,9 @@ def get_vertical_sum(vertical_list):
         elif element == "O":
             oCount += 1
             xCount = 0
-    if xCount > 4:
+    if xCount >= 4:
         return 1
-    elif oCount > 4:
+    elif oCount >= 4:
         return 2
     return 0
 
@@ -141,7 +140,6 @@ def get_player_move(position):
         try:
             val = int(inputString)
             suitable_moves = moves(position)
-            print(suitable_moves)
             if val in suitable_moves:
                 return val
             print("Entered invalid move!")
