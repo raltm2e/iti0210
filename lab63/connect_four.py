@@ -1,11 +1,10 @@
 import operator, random, copy
 
 
-def pure_mc(positions_list, my_side, N=20):
+def pure_mc(positions_list, my_side, N=200):
     initial_moves = moves(positions_list)
     win_counts = dict((move, 0) for move in initial_moves)
     returnable_positions_list = copy.deepcopy(positions_list)
-    print(returnable_positions_list)
     positions_list_copy = positions_list.copy()
     for move in initial_moves:
         for i in range(N):
@@ -15,7 +14,6 @@ def pure_mc(positions_list, my_side, N=20):
             elif res == "DRAW":
                 win_counts[move] += 0.5
     print("Win counts: ", win_counts)
-    print(returnable_positions_list)
     return max(win_counts.items(), key=operator.itemgetter(1))[0], returnable_positions_list
 
 
