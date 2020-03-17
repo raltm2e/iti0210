@@ -1,19 +1,22 @@
-import operator, random
+import operator, random, copy
 
 
-def pure_mc(positions_list, my_side, N=200):
+def pure_mc(positions_list, my_side, N=20):
     initial_moves = moves(positions_list)
     win_counts = dict((move, 0) for move in initial_moves)
+    returnable_positions_list = copy.deepcopy(positions_list)
+    print(returnable_positions_list)
+    positions_list_copy = positions_list.copy()
     for move in initial_moves:
         for i in range(N):
-            positions_list_copy = positions_list.copy()
-            res = simulate(positions_list_copy, my_side)
+            res = simulate(positions_list_copy.copy(), my_side)
             if res == "WIN":
                 win_counts[move] += 1
             elif res == "DRAW":
                 win_counts[move] += 0.5
     print("Win counts: ", win_counts)
-    return max(win_counts.items(), key=operator.itemgetter(1))[0]
+    print(returnable_positions_list)
+    return max(win_counts.items(), key=operator.itemgetter(1))[0], returnable_positions_list
 
 
 def play_game(positions_list, player_turn, player_side ="X"):
@@ -29,14 +32,23 @@ def play_game(positions_list, player_turn, player_side ="X"):
             player_turn = False
             positions_list = make_move(positions_list, move, player_side)
         else:
-            move = pure_mc(positions_list, oponent_side)
+            move, positions_list = pure_mc(positions_list, oponent_side)
             player_turn = True
             positions_list = make_move(positions_list, move, oponent_side)
         if is_over(positions_list) > 0:
             playing = False
+            print_board(positions_list)
+            end_value = is_over(positions_list)
+            print("Game over")
+            if end_value == 1:
+                print("You won!")
+            elif end_value == 2:
+                print("You lost!")
+            elif end_value == 3:
+                print("Draw...")
 
 
-def simulate(positions_list, player_side):
+def simulate(positions, player_side):
     playing = True
     player_turn = True
     oponent_side = "X"
@@ -44,18 +56,18 @@ def simulate(positions_list, player_side):
         oponent_side = "O"
     while playing:
         if player_turn:
-            move = get_random_move(positions_list)
+            move = get_random_move(positions)
             player_turn = False
-            positions_list = make_move(positions_list, move, player_side)
+            positions = make_move(positions, move, player_side)
         else:
-            move = get_random_move(positions_list)
+            move = get_random_move(positions)
             player_turn = True
-            positions_list = make_move(positions_list, move, oponent_side)
-        if is_over(positions_list) > 0:
+            positions = make_move(positions, move, oponent_side)
+        if is_over(positions) > 0:
             playing = False
-    if is_over(positions_list) == 2:
+    if is_over(positions) == 2:
         return "WIN"
-    if is_over(positions_list) == 3:
+    if is_over(positions) == 3:
         return "DRAW"
     else:
         return "LOSE"
