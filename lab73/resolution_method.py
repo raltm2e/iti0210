@@ -10,23 +10,43 @@ def simple_resolution_solver(map_dictionary):
 def check_neighbors(map_dictionary, element):
     print(element)
     neighbor_list = add_4_neighbors(map_dictionary, element)
+    info_from_neighbors = []
     if "CLEAR" in neighbor_list:
         return "SAFE"
+    if "" in neighbor_list:
+        count = 0
+        for i in neighbor_list:
+            if i == "":
+                count += 1
+        if count >= 2:
+            return "UNKNOWN"
     if element[0] > 1:
-        check_second_neighbor(map_dictionary, element, (element[0] - 1, element[1]))
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0] - 1, element[1])))
     if element[0] < 4:
-        check_second_neighbor(map_dictionary, element, (element[0] + 1, element[1]))
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0] + 1, element[1])))
     if element[1] > 1:
-        check_second_neighbor(map_dictionary, element, (element[0], element[1] - 1))
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0], element[1] - 1)))
     if element[1] < 4:
-        check_second_neighbor(map_dictionary, element, (element[0], element[1] + 1))
-    return "MONSTER"
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0], element[1] + 1)))
+    print("Info from neighbors: ", info_from_neighbors)
+    if "MONSTER" in info_from_neighbors and "PIT" not in info_from_neighbors:
+        return "MONSTER"
+    elif "MONSTER" not in info_from_neighbors and "PIT" in info_from_neighbors:
+        return "PIT"
+    else:
+        return "Broken..."
 
 
-def check_second_neighbor(map_dictionary, previous_element, element):
-    print("Second element is", element, map_dictionary[element])
+def check_second_neighbor(map_dictionary, parent_element, element):
     neighbor_list = add_4_neighbors(map_dictionary, element)
-    print(neighbor_list)
+    print("Second element is", map_dictionary[element], neighbor_list)
+    element_weather = map_dictionary[element]
+    if element_weather not in neighbor_list:
+        if element_weather == "WIND":
+            return "PIT"
+        elif element_weather == "STINKY":
+            return "MONSTER"
+    return ""
 
 
 def add_4_neighbors(map_dictionary, element):
