@@ -21,13 +21,13 @@ def check_neighbors(map_dictionary, element):
         if count >= 2:
             return "UNKNOWN"
     if element[0] > 1:
-        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0] - 1, element[1])))
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, (element[0] - 1, element[1])))
     if element[0] < 4:
-        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0] + 1, element[1])))
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, (element[0] + 1, element[1])))
     if element[1] > 1:
-        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0], element[1] - 1)))
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, (element[0], element[1] - 1)))
     if element[1] < 4:
-        info_from_neighbors.append(check_second_neighbor(map_dictionary, element, (element[0], element[1] + 1)))
+        info_from_neighbors.append(check_second_neighbor(map_dictionary, (element[0], element[1] + 1)))
     print("Info from neighbors: ", info_from_neighbors)
     if "MONSTER" in info_from_neighbors and "PIT" not in info_from_neighbors:
         return "MONSTER"
@@ -37,7 +37,7 @@ def check_neighbors(map_dictionary, element):
         return "Broken..."
 
 
-def check_second_neighbor(map_dictionary, parent_element, element):
+def check_second_neighbor(map_dictionary, element):
     neighbor_list = add_4_neighbors(map_dictionary, element)
     print("Second element is", map_dictionary[element], neighbor_list)
     element_weather = map_dictionary[element]
