@@ -23,16 +23,8 @@ def stopword(wstr):
     return False
 
 
-def read_message(message_file):
-    words = []
-    f = open(message_file, "r")
-    for line in f:
-        for word in line.split():
-            words.append(word)
-    return words
-
-
 def count_directory_words(directory_messages):
+    """Get all words as list in either spam or ham training folder."""
     words = []
     for message in directory_messages:
         for word in message:
@@ -47,7 +39,19 @@ def train_function(ham_l, spam_l):
     return ham_word_data, spam_word_data
 
 
+def read_message(message_file):
+    """Read message from a txt file. Return all words as list."""
+    words = []
+    f = open(message_file, "r")
+    for line in f:
+        for word in line.split():
+            if not stopword(word):
+                words.append(word)
+    return words
+
+
 def count_words(word, words):
+    """Count occurrence of same words in a message's words list."""
     same_words_in_message = 0
     for element in words:
         if element == word:
@@ -70,7 +74,7 @@ def get_message_probability(message_words, data_words):
 
 
 def classify_message(message_words, ham_l, spam_l):
-    """Calculates if message is spam or ham based on probability comparison."""
+    """Calculates if message is spam or ham based on probability comparison. Uses data from training messages."""
     data_ham_words, data_spam_words = train_function(ham_l, spam_l)
     message_unique_words = set(message_words)
     message_ham_words, message_spam_words = [], []
