@@ -57,13 +57,18 @@ def main(learning_rate, gamma, epsilon):
             if done:
                 reward = -reward  # simulatsioon lõppes enne 200 sammu, negatiivne tasu
 
-            table_key = (round(observation[1], 2), round(observation[2], 2))  # Cart velocity and Pole angle
-            next_table_key = (round(next_observation[1], 2), round(next_observation[2], 2))
+            cart_velocity = round(observation[1], 1)
+            if cart_velocity == -0.0:
+                cart_velocity = 0.0
+            table_key = (cart_velocity, round(observation[2], 1))  # Cart velocity and Pole angle
+            next_cart_velocity = round(next_observation[1], 1)
+            if next_cart_velocity == -0.0:
+                next_cart_velocity = 0.0
+            next_table_key = (next_cart_velocity, round(next_observation[2], 1))
 
             if table_key in q_table.keys():
                 if next_table_key in q_table.keys():
-                    q_table[table_key] += learning_rate * (
-                                reward + gamma * q_table[next_table_key] - q_table[table_key])
+                    q_table[table_key] += learning_rate * (reward + gamma * q_table[next_table_key] - q_table[table_key])
                 else:
                     q_table[table_key] += learning_rate * reward
             else:
@@ -76,9 +81,10 @@ def main(learning_rate, gamma, epsilon):
                 print("Episode {} finished after {} timesteps".format(i_episode, t + 1))
                 print(q_table)
                 break
-        if i_episode % 10 == 0 and epsilon > 0.1:
+        if i_episode % 50 == 0 and epsilon > 0.1 and i_episode != 0:
             epsilon -= 0.1
     env.close()
+    print(len(q_table.keys()))
 
 
 if __name__ == '__main__':
