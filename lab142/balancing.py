@@ -18,27 +18,33 @@ import gym
         1	Push cart to the right
 """
 
+def get_key(observation):
+    cart_velocity = round(observation[1] * 4) / 4  # Grouping measurements by 0.2 increments
+    pole_angle = round(observation[2] * 4) / 4
+    # if cart_velocity == -0.0:
+    #     cart_velocity = 0.0
+    # if pole_angle == -0.0:
+    #     pole_angle = 0.0
+    returnable_tuple = (cart_velocity, pole_angle)
+    return returnable_tuple
 
-def get_best_move(q_table):
-    biggest_value = -999999
-    correct_key = ()
+
+def get_best_move(q_table, observation):
+    angle = round(observation[2] * 4) / 4
     for key in q_table:
-        if q_table[key] > biggest_value:
-            biggest_value = q_table[key]
-            correct_key = key
-    if len(correct_key) == 0:
-        return random.choice([0, 1])
-    # if cart is going left
-    if correct_key[0] < 0:
-        return 0
-    else:
-        return 1
+        if key[1] == angle and q_table[key] > 1:
+            if key[0] <= 0:
+                return 0
+            else:
+                return 1
+        else:
+            return random.choice([0, 1])
 
 
-def get_move(epsilon, q_table):
+def get_move(epsilon, q_table, observation):
     # Return either 0 (left) or 1 (right)
     if random.random() > epsilon:
-        return get_best_move(q_table)
+        return get_best_move(q_table, observation)
     else:
         return random.choice([0, 1])
 
@@ -51,20 +57,14 @@ def main(learning_rate, gamma, epsilon):
         observation = env.reset()
         for t in range(200):
             env.render()
-            action = get_move(epsilon, q_table)
+            action = get_move(epsilon, q_table, observation)
 
             next_observation, reward, done, info = env.step(action)
             if done:
                 reward = -reward  # simulatsioon lõppes enne 200 sammu, negatiivne tasu
 
-            cart_velocity = round(observation[1], 1)
-            if cart_velocity == -0.0:
-                cart_velocity = 0.0
-            table_key = (cart_velocity, round(observation[2], 1))  # Cart velocity and Pole angle
-            next_cart_velocity = round(next_observation[1], 1)
-            if next_cart_velocity == -0.0:
-                next_cart_velocity = 0.0
-            next_table_key = (next_cart_velocity, round(next_observation[2], 1))
+            table_key = get_key(observation)  # Cart velocity and Pole angle
+            next_table_key = get_key(next_observation)
 
             if table_key in q_table.keys():
                 if next_table_key in q_table.keys():
@@ -72,7 +72,7 @@ def main(learning_rate, gamma, epsilon):
                 else:
                     q_table[table_key] += learning_rate * reward
             else:
-                q_table[table_key] = learning_rate * reward
+                q_table[table_key] = 0
 
             # Q[s,a] += learning_rate * (reward + gamma * Q[s',a'] - Q[s,a])
 
@@ -81,14 +81,14 @@ def main(learning_rate, gamma, epsilon):
                 print("Episode {} finished after {} timesteps".format(i_episode, t + 1))
                 print(q_table)
                 break
-        if i_episode % 50 == 0 and epsilon > 0.1 and i_episode != 0:
+        if i_episode % 20 == 0 and epsilon > 0.1 and i_episode != 0:
             epsilon -= 0.1
     env.close()
     print(len(q_table.keys()))
 
 
 if __name__ == '__main__':
-    learning_rate = 0.1
+    learning_rate = 0.2
     gamma = 1
     epsilon = 1  # Randomness chance when choosing an action
     main(learning_rate, gamma, epsilon)
